@@ -1,7 +1,7 @@
 /*
  * YATE template engine
  *
- * $Id: tpl_scanner.l,v 1.2 2003/12/20 22:34:40 mclap Exp $
+ * $Id: tpl_scanner.l,v 1.3 2003/12/20 22:44:16 mclap Exp $
  */
 %{
 
@@ -44,6 +44,7 @@ int tpl_line = 0;
 %x IN_TEMPLATE
 %x IN_LITERAL
 %x IN_TPL_DQUOTE
+%x IN_COMMENT
 
 LABEL		[a-zA-Z_]+[0-9a-zA-Z_]*
 SPACE		[ \t\r\n]+
@@ -62,7 +63,12 @@ FLOAT		[0-9]*\.[0-9]+
 
 <INITIAL>"{pre}"{NEWLINE}? {
 	HPOS;
-	BEGIN IN_LITERAL;
+	BEGIN(IN_LITERAL);
+}
+
+<INITIAL>"{*" {
+	STDPOS;
+	BEGIN(IN_COMMENT);
 }
 
 <INITIAL>"{if:"		{ STDPOS; BEGIN(IN_TEMPLATE); return IF; }
@@ -140,6 +146,15 @@ FLOAT		[0-9]*\.[0-9]+
 
 <IN_LITERAL>"{" {
 	yymore();
+}
+
+<IN_COMMENT>[^*]+ {
+	yymore();
+}
+
+<IN_COMMENT>"*}"{NEWLINE}? {
+	HPOS;
+	BEGIN(INITIAL);
 }
 
 %%

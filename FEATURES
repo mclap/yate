@@ -2,7 +2,7 @@ YATE (yet another template engine)
 
 Features list
 
-$Id: FEATURES,v 1.1 2003/12/14 15:27:56 mclap Exp $
+$Id: FEATURES,v 1.2 2003/12/20 22:44:16 mclap Exp $
 
 1. data types
 - int
@@ -36,3 +36,5 @@ eq, ne, ge, le
 - while
 - pre
 
+4. comments
+{* comment *}
