@@ -1,0 +1,38 @@
+YATE (yet another template engine)
+
+Features list
+
+$Id: FEATURES,v 1.1 2003/12/14 15:27:56 mclap Exp $
+
+1. data types
+- int
+- float
+- string
+- array
+- null
+
+2. operations
+2.1. arithmetic operations
++-*/
+{1+1}
+
+2.2. logic operations
+<, >, ==, !=, >=, <=,
+eq, ne, ge, le
+
+2.3. string operations
+"some"."string"			= "somestring"
+
+2.4. variable assigment
+{$var=expression}
+
+2.5. types conversion
+1.1				= float, 1.1
+1.1.1				= string, "1.11"
+"1"+"2"				= int, 3
+
+3. flow operators
+- if...elseif...else...
+- while
+- pre
+
