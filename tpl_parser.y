@@ -1,3 +1,8 @@
+/*
+ * YATE template engine
+ *
+ * $Id: tpl_parser.y,v 1.2 2003/12/20 22:34:40 mclap Exp $
+ */
 %{
 #include <stdio.h>
 #include <string.h>
@@ -74,7 +79,7 @@ printf("\n===============\nafter nfree\n");
 	;
 
 template_block:
-	block					{ $$ = $1 }
+	block					{ $$ = $1; }
 	| template_block block	{ $$ = nop(';',2, $1,$2); }
 	;
 

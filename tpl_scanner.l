@@ -1,6 +1,7 @@
 /*
- * YATE
+ * YATE template engine
  *
+ * $Id: tpl_scanner.l,v 1.2 2003/12/20 22:34:40 mclap Exp $
  */
 %{
 

@@ -1,3 +1,8 @@
+/*
+ * YATE template engine
+ *
+ * $Id: lextpl.h,v 1.2 2003/12/20 22:34:40 mclap Exp $
+ */
 #ifndef __lextpl_h__
 #define __lextpl_h__
 
