@@ -1,0 +1,31 @@
+[ ] memory leak ?
+
+[ ] operator[] for arrays
+[ ] {for:assign_stmt_block ',' expr ... ???
+[ ] {foreach: $avar, $key, $value}
+[ ] capture:  {capture($a)} stmt {/capture}
+[ ] max execution time (settings ?)
+
+--
+2003.12.13
+[X] linux compatibility
+[X] gcc 2.95 compatible (unnamed union)
+[X] 100,000 циклов while за ~2 sec
+
+2003.12.11
+[X] {while:expr}stmt{/while}
+[X] {if:expr}stmt{else}stmt{/if}
+[X] {if:expr}stmt{elseif:expr}stmt{else}stmt{/if}
+
+2003.12.10:
+[X] {if:expr}stmt{/if}
+[X] swctx(int)
+[X] определение line:pos для сообщений об ошибке
+
+before 2003.12.10:
+[X] оператор присваивания $a=$b
+[X] оператор конкатенации $a.$b
+[X] vnew(int type, ...);
+[X] примитивные строковые константы ("...")
+[X] числовые константы (int/float)
+[X] nexec должен возвращать lexvalue
