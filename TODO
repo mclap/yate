@@ -1,5 +1,5 @@
-[ ] {include: expr}
-[ ] separate parsing & executing
+$Id: TODO,v 1.5 2003/12/21 01:07:34 mclap Exp $
+
 [ ] save/load compiled tree
 [ ] memory leak ?
 
@@ -12,6 +12,8 @@
 --
 2003.12.21
 [X] comments {* ... *}
+[X] {include: expr}
+[X] separate parsing & executing
 
 2003.12.14
 [!] bug in '.', если первое представлено числом.

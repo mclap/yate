@@ -1,29 +1,22 @@
 /*
  * YATE template engine
  *
- * $Id: tpl_parser.y,v 1.2 2003/12/20 22:34:40 mclap Exp $
+ * $Id: tpl_parser.y,v 1.3 2003/12/21 01:07:34 mclap Exp $
  */
 %{
 #include <stdio.h>
 #include <string.h>
-#include "lextpl.h"
+#include "yate.h"
 
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
 
-#define YY_parse_PARSE_PARAM lte
-#define YY_parse_PARSE_PARAM_DEF lextpl *lte
-
-lexvalue *GLOBALS;
-
-extern int tpl_pos, tpl_line;
+struct _yp_state *__ys = 0;
 
 extern void swctx(int ctx);
 extern int vfree_debug;
 
 int yywrap() { return 1; }
-
-#define TPL	1
 
 %}
 
@@ -51,9 +44,9 @@ int yywrap() { return 1; }
 %left '*' '/'
 %left '['
 %nonassoc UMINUS
-%token IF
-%token ELSEIF ELSE IF_CLOSE
+%token IF ELSEIF ELSE IF_CLOSE
 %token WHILE WHILE_CLOSE
+%token INCLUDE
 
 %type <node> block template_block expr var stmt elseif_block else_block assign_stmt
 
@@ -61,20 +54,16 @@ int yywrap() { return 1; }
 
 template:
 	template_block		{
+		__ys->prog = $1;
+		/*
 		lexvalue *v = nexec($1);
 		if (v) {
 			vbuf_write(v);
 			if (v->tmp) vfree(v);
 		}
-/*printf("\n===============\nbefore nfree\n");
-	getch();
-vfree_debug=1;
-*/
+
 		nfree($1);
-/*
-printf("\n===============\nafter nfree\n");
-	getch();
-*/
+		*/
 	}
 	;
 
@@ -87,6 +76,7 @@ block:
 	DATA					{ $$ = ndata($1); }
 	| IF expr '}' { swctx(0); } template_block elseif_block IF_CLOSE { $$ = nop(IF, 3, $2, $5, $6); }
 	| WHILE expr '}' { swctx(0); } template_block WHILE_CLOSE { $$ = nop(WHILE, 2, $2, $5); }
+	| INCLUDE expr '}'		{ $$ = nop(INCLUDE, 1, $2); }
 	| '{' stmt '}' { $$ = $2; }
 	;
 
@@ -127,13 +117,13 @@ expr:
 	;
 
 elseif_block:
-	/* empty */ { $$ = 0; printf("{0}"); }
-	| elseif_block ELSEIF expr '}' { swctx(0); printf("["); } template_block else_block { $$ = nop(IF, 3, $3, $6, $7); }
+	/* empty */ { $$ = 0; }
+	| elseif_block ELSEIF expr '}' { swctx(0); } template_block else_block { $$ = nop(IF, 3, $3, $6, $7); }
 	;
 
 else_block:
 	/* empty */ { $$ = 0; }
-	| ELSE { swctx(0); printf("["); } template_block { $$ = $3; }
+	| ELSE { swctx(0); } template_block { $$ = $3; }
 	;
 
 %%
@@ -141,44 +131,33 @@ else_block:
 int yyerror(char *s) {
 extern char *yytext;
 extern int getctx();
-    fprintf(stdout, "[%d:%d] %s (yytext=%s, yy_start=%d)\n", tpl_line, tpl_pos, s, yytext, getctx());
+    fprintf(stdout, "[%d:%d] %s (yytext=%s, yy_start=%d)\n", __ys->line, __ys->pos, s, yytext, getctx());
 }
 
 extern char *_outbuffer;
 extern int _ob_length;
 extern int _ob_size;
 
-int main() {
-	lexvalue *k, *v;
+lnode *_yate_prepare(char *filename) {
 	extern FILE *yyin;
+	struct _yp_state ys, *ys_prev;
+	FILE *in_prev;
 
-//	yyin = fopen("test_current","r");
-/*
-printf("before start\n");
-	getch();
-*/
-	GLOBALS = vnew(LV_ARRAY);
+	in_prev = yyin;
+	yyin = fopen(filename,"r");
+	if (!yyin) {
+		yyin=in_prev;
+		return 0;
+	}
 
-/*
-	k = vnew(LV_STRING,"world",0);
-	v = vnew(LV_STRING,"big world",0);
-	vadd(GLOBALS, k, v);
+	memset(&ys, 0, sizeof(struct _yp_state));
 
-	k = vnew(LV_STRING,"i",0); v = vnew(LV_STRING,"2",0); vadd(GLOBALS, k, v);
-	k = vnew(LV_STRING,"j",0); v = vnew(LV_STRING,"7",0); vadd(GLOBALS, k, v);
-
-	vfree(GLOBALS);
-*/
+	ys_prev = __ys; __ys = &ys;
 	yyparse();
-	printf("\n===============\nsizeof ob=%d\n----------\n", _ob_length);
-	printf("%s\n", _outbuffer);
-/*
-	getch();
-*/
-	FREE(_outbuffer);
-	vfree(GLOBALS);
-/*
-*/
-//	getch();
-	return 0;
+	__ys = ys_prev;
+
+	fclose(yyin);
+
+	yyin = in_prev;
+	return ys.prog;
 }

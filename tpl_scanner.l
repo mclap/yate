@@ -1,7 +1,7 @@
 /*
  * YATE template engine
  *
- * $Id: tpl_scanner.l,v 1.3 2003/12/20 22:44:16 mclap Exp $
+ * $Id: tpl_scanner.l,v 1.4 2003/12/21 01:07:34 mclap Exp $
  */
 %{
 
@@ -9,10 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tpl_parser.h"
-#include "lextpl.h"
-
-int tpl_pos = 0;
-int tpl_line = 0;
+#include "yate.h"
 
 #define HANDLE_POS(ap, l)										\
 {																\
@@ -20,23 +17,23 @@ int tpl_line = 0;
 	p = (ap); end = p + (l);									\
 	while (p < end) {											\
 		if (*p == '\n') {										\
-			tpl_line++;											\
-			tpl_pos = 0;										\
+			__ys->line++;										\
+			__ys->pos = 0;										\
 		}														\
 		else {													\
 			if (*p == '\r' && p+1 < end && *(p+1) == '\n') {	\
-				tpl_line++;										\
-				tpl_pos = 0;									\
+				__ys->line++;									\
+				__ys->pos = 0;									\
 			}													\
 			else												\
-				tpl_pos++;										\
+				__ys->pos++;									\
 		}														\
 		p++;													\
 	}															\
 }
 
 #define HPOS	HANDLE_POS(yytext, yyleng)
-#define STDPOS	{ tpl_pos += yyleng; }
+#define STDPOS	{ __ys->pos += yyleng; }
 
 
 %}
@@ -78,6 +75,8 @@ FLOAT		[0-9]*\.[0-9]+
 
 <INITIAL>"{while:"	{ STDPOS; BEGIN(IN_TEMPLATE); return WHILE; }
 <INITIAL>"{/while}"	{ STDPOS; return WHILE_CLOSE; }
+
+<INITIAL>"{include:" { STDPOS; BEGIN(IN_TEMPLATE); return INCLUDE; }
 
 <INITIAL>[^{]+ {
 	yylval.lexval = vnew(LV_STRING, yytext, yyleng);
