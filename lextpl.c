@@ -240,7 +240,11 @@ lexvalue *nexec(lnode *n) {
 							if (r) {
 								r->u.sval = (char *)CALLOC(1, l1+l2+1);
 								if (l1) memcpy(r->u.sval, val2str(k), l1);
-								if (l2) memcpy(r->u.sval+l1, val2str(v), l2);
+								if (l2) {
+									r->u.sval[l1] = 0;
+									if (l1==LEXVAL_BUFSZ) l1 = strlen(r->u.sval);
+									memcpy(r->u.sval+l1, val2str(v), l2);
+								}
 								r->u.sval[l1+l2] = 0;
 							}
 						}

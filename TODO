@@ -7,6 +7,9 @@
 [ ] max execution time (settings ?)
 
 --
+2003.12.14
+[!] bug in '.', если первое предсталено числом.
+
 2003.12.13
 [X] linux compatibility
 [X] gcc 2.95 compatible (unnamed union)
